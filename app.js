@@ -33,15 +33,14 @@ app.get("/",function(req, res) {
   });
 });
 
+
 // POSTS
 app.get("/posts/:postId", function(req, res) {
   const requestedPostId = req.params.postId
   Post.findOne({_id: requestedPostId}, function(err, post) {
-    res.render("post", {titleOfPost: post.title, contentOfPost: post.content});
+    res.render("post", {titleOfPost: post.title, contentOfPost: post.content, postId: post._id});
   });
-
 });
-
 
 
 // COMPOSE PAGE
@@ -57,6 +56,37 @@ app.post("/compose", function(req, res) {
   post.save(function(err){
     if(!err){
       res.redirect("/");
+    }
+  });
+});
+
+
+// DELETE POST
+app.get("/posts/:postId/delete", function(req, res) {
+  const requestedPostId = req.params.postId
+  Post.findOneAndDelete({_id: requestedPostId}, function(err, post) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      res.redirect("/");
+    }
+  });
+});
+
+
+// UPDATE POST
+app.get("/posts/:postId/update", function(req, res) {
+  const requestedPostId = req.params.postId;
+  Post.findOne({_id: requestedPostId}, function(err, post) {
+    res.render("update", {titleOfPost: post.title, contentOfPost: post.content, postId: post._id});
+  });
+});
+app.post("/posts/:postId/update", function(req, res) {
+  const requestedPostId = req.params.postId;
+  Post.findOneAndUpdate({_id: requestedPostId}, {title: req.body.postTitle, content: req.body.postBody}, function(err, succ) {
+    if(!err){
+      res.redirect("/posts/" + requestedPostId);
     }
   });
 });
